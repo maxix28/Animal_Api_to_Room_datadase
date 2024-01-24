@@ -12,26 +12,45 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.animalapi.CatApplication
 import com.example.animalapi.data.CatRepository
+import com.example.animalapi.network.CatsItem
 import kotlinx.coroutines.Delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+sealed interface CatsState{
+    object Loading: CatsState
+    object Error: CatsState
 
+   data class Success( val catList : List<CatsItem>): CatsState
+}
 @OptIn(InternalCoroutinesApi::class)
 class CatsViewModel(private val catRepository: CatRepository): ViewModel() {
+
+    var CatsUIState : CatsState by mutableStateOf(CatsState.Loading )
     var UiState by mutableStateOf("Loading")
     private suspend fun getCatByID(){
         UiState = catRepository.getCarByID("0XYvRd7oD").toString()
     }
-    private suspend fun getCats(){
+     suspend fun getCats(){
+        try{
+
+            CatsUIState = CatsState.Success(catRepository.getCats())
+        }catch (e:Exception){
+            CatsUIState = CatsState.Error
+        }
         UiState = catRepository.getCats().toString()
     }
 init{
     viewModelScope.launch {
         withContext(Dispatchers.IO){
 
-            this@CatsViewModel.getCats()
+              getCats()
+
+
+
+
+
         }
 
     }
