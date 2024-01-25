@@ -23,14 +23,16 @@ sealed interface CatsState{
     object Error: CatsState
 
    data class Success( val catList : List<CatsItem>): CatsState
+
 }
 @OptIn(InternalCoroutinesApi::class)
 class CatsViewModel(private val catRepository: CatRepository): ViewModel() {
 
     var CatsUIState : CatsState by mutableStateOf(CatsState.Loading )
     var UiState by mutableStateOf("Loading")
-    private suspend fun getCatByID(){
-        UiState = catRepository.getCarByID("0XYvRd7oD").toString()
+     suspend fun getCatByID(id: String){
+
+        UiState = catRepository.getCarByID(id).toString()
     }
      suspend fun getCats(){
         try{
@@ -39,17 +41,13 @@ class CatsViewModel(private val catRepository: CatRepository): ViewModel() {
         }catch (e:Exception){
             CatsUIState = CatsState.Error
         }
-        UiState = catRepository.getCats().toString()
+       // UiState = catRepository.getCats().toString()
     }
 init{
     viewModelScope.launch {
         withContext(Dispatchers.IO){
 
               getCats()
-
-
-
-
 
         }
 

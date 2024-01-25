@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 
 data class CatByID(
-    val breeds: List<Breed>,
+    val breeds: List<Breed>? = null,
     val height: Int,
     val id: String,
     val url: String,
