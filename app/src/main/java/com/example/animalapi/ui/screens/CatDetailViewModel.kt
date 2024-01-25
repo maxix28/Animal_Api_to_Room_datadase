@@ -8,14 +8,17 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.animalapi.CatApplication
 import com.example.animalapi.data.CatRepository
 import com.example.animalapi.network.CatByID
+import com.example.animalapi.ui.navigation.Destination
 import kotlinx.coroutines.launch
 
 
@@ -26,9 +29,12 @@ sealed interface CatUIState{
     data class Success( val cat: CatByID): CatUIState
 
 }
-class CatDetailViewModel(private val catRepository: CatRepository): ViewModel() {
+object CatID {
+    var id =""
+}
+class CatDetailViewModel(savedStateHandle: SavedStateHandle, private val catRepository: CatRepository): ViewModel() {
     var UIState: CatUIState by mutableStateOf(CatUIState.Loading )
-
+var catID = checkNotNull(savedStateHandle[Destination.CatItemByID.CatID]).toString()?:null
     private suspend fun getCatByID(id: String){
         try{
             val result = catRepository.getCarByID(id)
@@ -41,7 +47,7 @@ class CatDetailViewModel(private val catRepository: CatRepository): ViewModel() 
     }
 init{
     viewModelScope.launch {
-        getCatByID("MTk4MTg5Ng")
+        getCatByID(catID!!)
     }
 
 }
@@ -51,7 +57,7 @@ init{
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
                 val catRepository = application.container.catRepository
-                CatDetailViewModel(catRepository)
+                CatDetailViewModel(this.createSavedStateHandle(),catRepository)
             }
         }
     }

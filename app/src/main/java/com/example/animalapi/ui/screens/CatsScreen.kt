@@ -29,7 +29,10 @@ import com.example.animalapi.network.CatsItem
 import kotlinx.coroutines.launch
 
 @Composable
-fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Factory), modifier: Modifier = Modifier,onCatClicked :() -> Unit){
+fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Factory),
+                modifier: Modifier = Modifier,
+                onCatClicked1 :(String) -> Unit){
+
 val CoroutineScope = rememberCoroutineScope()
     when(viewModel.CatsUIState){
         CatsState.Error -> {
@@ -47,8 +50,7 @@ val CoroutineScope = rememberCoroutineScope()
                     viewModel.getCats()
                 }
                },
-                onCatClicked =
-                onCatClicked
+                onCatClicked = onCatClicked1
 
             )
         }
@@ -58,17 +60,17 @@ val CoroutineScope = rememberCoroutineScope()
 
 
 @Composable
-fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier, onMoreClick : ()-> Unit,onCatClicked :() -> Unit ){
+fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier, onMoreClick : ()-> Unit,onCatClicked :(String) -> Unit ){
     Column(modifier = modifier.fillMaxSize()){
         LazyVerticalGrid( columns = GridCells.Adaptive(128.dp),
             content={
                 items(catList.size){index->
-                    CatFromList(catList[index], onCatClicked = {onCatClicked})
+                    CatFromList(catList[index], onCatClicked = onCatClicked)
                 }
 
             })
 
-        Button(onClick = {onMoreClick}, modifier = modifier.align(Alignment.CenterHorizontally)) {
+        Button(onClick = onMoreClick, modifier = modifier.align(Alignment.CenterHorizontally)) {
             Text(text =" More Cats")
 
         }
@@ -79,16 +81,13 @@ fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier, onMoreClick 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked :() -> Unit ){
+fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked :(String) -> Unit ){
     AsyncImage(model = catsItem.url, contentDescription = null,modifier= modifier
         .padding(10.dp)
         .shadow(10.dp)
         .combinedClickable(
-            onClick = {
-                println("Try to navigate")
-
-                onCatClicked
-            },
+            onClick = {onCatClicked(catsItem.id)}
+            ,
             onLongClick = {}
         ),
         )
@@ -105,7 +104,7 @@ fun CatByID(modifier: Modifier = Modifier,
         //Text(text = viewModel.UiState)
         when(viewModel.UIState){
             CatUIState.Error -> {
-                Text("error")
+                Text("error cat ID")
             }
             CatUIState.Loading -> {
                 CircularProgressIndicator()
@@ -116,7 +115,10 @@ fun CatByID(modifier: Modifier = Modifier,
         }
 
     }
+}
 
 
-
+@Composable
+fun TestScreen(){
+    Text(text = " Texttttttttttttt")
 }
