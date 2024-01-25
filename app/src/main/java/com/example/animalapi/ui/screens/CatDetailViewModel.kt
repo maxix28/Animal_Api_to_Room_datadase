@@ -39,6 +39,8 @@ var catID = checkNotNull(savedStateHandle[Destination.CatItemByID.CatID]).toStri
         try{
             val result = catRepository.getCarByID(id)
             UIState = CatUIState.Success(result)
+            Log.d("CAT", result.toString())
+
 
         }catch (e:Exception){
             UIState = CatUIState.Error

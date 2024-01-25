@@ -20,17 +20,13 @@ private val baseUrl="https://api.thecatapi.com/"
 
 private val retrofit = Retrofit.Builder()
     .baseUrl(baseUrl)
-    //.addConverterFactory(MoshiConverterFactory.create())
+
     .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-    //.addConverterFactory(GsonConverterFactory.create())
-    //.addConverterFactory(ScalarsConverterFactory.create())
+
 
     .build()
     .create(CatApiInterface::class.java)
-//
-//    private val retrofitService : CatApiInterface by lazy {
-//        retrofit.create(CatApiInterface::class.java)
-//    }
+
 
     override val catRepository: CatRepository by lazy {
         NetworkCatRepository(retrofit)

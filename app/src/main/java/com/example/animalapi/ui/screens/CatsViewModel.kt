@@ -29,11 +29,8 @@ sealed interface CatsState{
 class CatsViewModel(private val catRepository: CatRepository): ViewModel() {
 
     var CatsUIState : CatsState by mutableStateOf(CatsState.Loading )
-    var UiState by mutableStateOf("Loading")
-     suspend fun getCatByID(id: String){
 
-        UiState = catRepository.getCarByID(id).toString()
-    }
+
      suspend fun getCats(){
         try{
 
@@ -42,6 +39,10 @@ class CatsViewModel(private val catRepository: CatRepository): ViewModel() {
             CatsUIState = CatsState.Error
         }
        // UiState = catRepository.getCats().toString()
+    }
+    suspend  fun tryAgain(){
+        CatsUIState = CatsState.Loading
+        getCats()
     }
 init{
     viewModelScope.launch {
@@ -52,6 +53,8 @@ init{
         }
 
     }
+
+
 
 
 }

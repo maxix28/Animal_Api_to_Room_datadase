@@ -90,6 +90,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.6.0")
 
 
+    implementation ("androidx.activity:activity-compose:1.8.2")
+
 
     implementation ("com.squareup.retrofit:retrofit:2.0.0-beta1")
     implementation ("com.squareup.okhttp:okhttp:2.5.0")
