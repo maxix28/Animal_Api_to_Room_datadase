@@ -1,5 +1,7 @@
 package com.example.animalapi.data
 
+import android.content.Context
+import com.example.animalapi.databasaData.CatDataBase
 import com.example.animalapi.network.CatApiInterface
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -13,9 +15,10 @@ import retrofit2.create
 
 interface AppContainer {
     val catRepository: CatRepository
+
 }
 
-class DefaultAppContainer: AppContainer{
+class DefaultAppContainer(val context: Context): AppContainer{
 private val baseUrl="https://api.thecatapi.com/"
 
 private val retrofit = Retrofit.Builder()
@@ -29,6 +32,6 @@ private val retrofit = Retrofit.Builder()
 
 
     override val catRepository: CatRepository by lazy {
-        NetworkCatRepository(retrofit)
+        NetworkCatRepository(retrofit,CatDataBase.getDataBase(context).catDao())
     }
 }
