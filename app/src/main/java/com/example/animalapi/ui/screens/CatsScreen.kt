@@ -1,18 +1,35 @@
 package com.example.animalapi.ui.screens
 
+import android.content.ClipData
+import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,29 +43,46 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.animalapi.network.CatByID
 import com.example.animalapi.network.CatsItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
-fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Factory), modifier: Modifier = Modifier,onCatClicked :() -> Unit){
+fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Factory),
+                modifier: Modifier = Modifier,
+                onCatClicked1 :(String) -> Unit){
+
 val CoroutineScope = rememberCoroutineScope()
     when(viewModel.CatsUIState){
         CatsState.Error -> {
+            IconButton(onClick = {
+                CoroutineScope.launch {
+                    withContext(Dispatchers.IO) {
+
+                        viewModel.tryAgain()
+                    }
+                }}) {
+                Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
+
+            }
 
         }
         CatsState.Loading -> {
-            Box(modifier = modifier.fillMaxSize()){
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                 CircularProgressIndicator()
             }
         }
         is CatsState.Success -> {
 
-            CatList((viewModel.CatsUIState as CatsState.Success).catList, onMoreClick ={
+            CatList((viewModel.CatsUIState as CatsState.Success).catList, onMoreCats ={
                 CoroutineScope.launch {
-                    viewModel.getCats()
+                    withContext(Dispatchers.IO){
+                        viewModel.tryAgain()
+                    }
+
                 }
                },
-                onCatClicked =
-                onCatClicked
+                onCatClicked = onCatClicked1
 
             )
         }
@@ -58,40 +92,65 @@ val CoroutineScope = rememberCoroutineScope()
 
 
 @Composable
-fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier, onMoreClick : ()-> Unit,onCatClicked :() -> Unit ){
-    Column(modifier = modifier.fillMaxSize()){
-        LazyVerticalGrid( columns = GridCells.Adaptive(128.dp),
-            content={
-                items(catList.size){index->
-                    CatFromList(catList[index], onCatClicked = {onCatClicked})
-                }
+fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier,onCatClicked :(String) -> Unit , onMoreCats:()->Unit){
+    val coroutineScope = rememberCoroutineScope()
+LaunchedEffect(key1 = catList){
+    catList.sortedBy { it.height   }
+}
 
-            })
 
-        Button(onClick = {onMoreClick}, modifier = modifier.align(Alignment.CenterHorizontally)) {
-            Text(text =" More Cats")
+    Column(    modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
 
+            LazyVerticalGrid(columns = GridCells.Adaptive(128.dp),
+                content = {
+                    items(catList.size) { index ->
+                        CatFromList(catList[index], onCatClicked = onCatClicked)
+                    }
+
+                })
+        Row(  modifier = modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center){
+            Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
+                Text(text =" More Cats")
+
+
+            }
         }
+
+
+
+
+
+
+
+           
+
+
+
     }
+    
 
 }
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked :() -> Unit ){
-    AsyncImage(model = catsItem.url, contentDescription = null,modifier= modifier
-        .padding(10.dp)
-        .shadow(10.dp)
-        .combinedClickable(
-            onClick = {
-                println("Try to navigate")
+fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked :(String) -> Unit ){
+    Card(modifier = modifier
+        .wrapContentSize()
+        .padding(10.dp)){
+        AsyncImage(model = catsItem.url, contentDescription = null,modifier= modifier
 
-                onCatClicked
-            },
-            onLongClick = {}
-        ),
+            .shadow(5.dp)
+            .combinedClickable(
+                onClick = { onCatClicked(catsItem.id) },
+                onLongClick = {
+                    Log.d("CAT", "Long cat")
+                }
+            )
+            .animateContentSize(),
         )
+    }
+
 }
 
 
@@ -105,18 +164,43 @@ fun CatByID(modifier: Modifier = Modifier,
         //Text(text = viewModel.UiState)
         when(viewModel.UIState){
             CatUIState.Error -> {
-                Text("error")
+                Text("error cat ID")
             }
             CatUIState.Loading -> {
-                CircularProgressIndicator()
+                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    CircularProgressIndicator()
+                }
             }
             is CatUIState.Success -> {
-                AsyncImage(model = (viewModel.UIState as CatUIState.Success).cat.url, contentDescription =null )
+               // AsyncImage(model = (viewModel.UIState as CatUIState.Success).cat.url, contentDescription =null )
+                CatDetailScreen((viewModel.UIState as CatUIState.Success))
             }
         }
 
     }
+}
+
+
+@Composable
+fun CatDetailScreen(state :CatUIState.Success,modifier: Modifier= Modifier){
+var Cat = state.cat
+    val coroutineScope = rememberCoroutineScope()
+    Column (modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+
+        Card(elevation = CardDefaults.cardElevation(
+            defaultElevation = 25.dp
+        ), modifier = modifier.animateContentSize  ()){
+
+                AsyncImage(model = Cat.url, contentDescription = null,modifier = modifier.height(290.dp) )
 
 
 
+        }
+
+    }
+}
+
+@Composable
+fun TestScreen(){
+    Text(text = " Texttttttttttttt")
 }

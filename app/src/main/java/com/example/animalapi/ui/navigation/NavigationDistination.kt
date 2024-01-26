@@ -13,5 +13,8 @@ sealed class Destination{
     object CatItemByID: NavigationDistination {
         override val route: String
             get() = "Cat_Info"
+        const val CatID = "id"
+        val routeWithArgs = "$route/{$CatID}"
+
     }
 }
