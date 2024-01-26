@@ -10,6 +10,10 @@ sealed class Destination{
         override val route: String
             get() = "home"
     }
+    object CatDB: NavigationDistination {
+        override val route: String
+            get() = "favourite"
+    }
     object CatItemByID: NavigationDistination {
         override val route: String
             get() = "Cat_Info"
