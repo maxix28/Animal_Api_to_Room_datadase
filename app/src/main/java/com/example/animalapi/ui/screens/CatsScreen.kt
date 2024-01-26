@@ -53,30 +53,34 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Factory),
-                modifier: Modifier = Modifier,
-                onCatClicked1 :(String) -> Unit, onFavourite : ()->Unit){
+fun CatsScreen(
+    viewModel: CatsViewModel = viewModel(factory = CatsViewModel.Factory),
+    modifier: Modifier = Modifier,
+    onCatClicked1: (String) -> Unit, onFavourite: () -> Unit
+) {
     val mContext = LocalContext.current
     val CoroutineScope = rememberCoroutineScope()
     Scaffold(modifier = modifier.fillMaxSize(),
         bottomBar = {
-            Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
-            Button(onClick = {    CoroutineScope.launch {
-                withContext(Dispatchers.IO){
-                    viewModel.tryAgain()
-                }
+            Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Button(onClick = {
+                    CoroutineScope.launch {
+                        withContext(Dispatchers.IO) {
+                            viewModel.tryAgain()
+                        }
 
-            } }, modifier = modifier.padding(10.dp)) {
-                Text(text =" More Cats")
+                    }
+                }, modifier = modifier.padding(10.dp)) {
+                    Text(text = " More Cats")
+                }
             }
-        }}
-        ,
+        },
         floatingActionButton = {
             IconButton(onClick = onFavourite) {
-                Icon(imageVector = Icons.Default.Favorite, contentDescription ="Favourite" )
+                Icon(imageVector = Icons.Default.Favorite, contentDescription = "Favourite")
             }
-        }) {paddingValues ->
-        when(viewModel.CatsUIState){
+        }) { paddingValues ->
+        when (viewModel.CatsUIState) {
             CatsState.Error -> {
                 IconButton(onClick = {
                     CoroutineScope.launch {
@@ -84,19 +88,24 @@ fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Fa
 
                             viewModel.tryAgain()
                         }
-                    }}, modifier = modifier.padding(paddingValues)) {
+                    }
+                }, modifier = modifier.padding(paddingValues)) {
                     Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
 
                 }
 
             }
+
             CatsState.Loading -> {
-                Box( contentAlignment = Alignment.Center, modifier = modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()){
+                Box(
+                    contentAlignment = Alignment.Center, modifier = modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                ) {
                     CircularProgressIndicator()
                 }
             }
+
             is CatsState.Success -> {
 
                 CatList((viewModel.CatsUIState as CatsState.Success).catList,
@@ -112,12 +121,13 @@ fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Fa
                     onCatClicked = onCatClicked1,
                     onSaveCat = {
                         CoroutineScope.launch {
-                            withContext(Dispatchers.IO){
+                            withContext(Dispatchers.IO) {
 
                                 viewModel.AddCatToDataBase(it)
 
                             }
-                            Toast.makeText(mContext,"Added to Favourite ", Toast.LENGTH_LONG).show()
+                            Toast.makeText(mContext, "Added to Favourite ", Toast.LENGTH_LONG)
+                                .show()
                         }
                     }
 
@@ -131,29 +141,31 @@ fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Fa
 
 
 @Composable
-fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier,
-            onCatClicked :(String) -> Unit ,
-         //   onMoreCats:()->Unit,
-            onSaveCat: ( CatsItem)->Unit
-)
-{
+fun CatList(
+    catList: List<CatsItem>, modifier: Modifier = Modifier,
+    onCatClicked: (String) -> Unit,
+    //   onMoreCats:()->Unit,
+    onSaveCat: (CatsItem) -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
-LaunchedEffect(key1 = catList){
-    catList.sortedBy { it.height   }
-}
+    LaunchedEffect(key1 = catList) {
+        catList.sortedBy { it.height }
+    }
 
 
-    Column(    modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+    Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
 
-            LazyVerticalGrid(columns = GridCells.Adaptive(128.dp),
-                content = {
-                    items(catList.size) { index ->
-                        CatFromList(catList[index], onCatClicked = onCatClicked, onSaveCat = onSaveCat)
-                    }
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(128.dp),
+            content = {
+                items(catList.size) { index ->
+                    CatFromList(catList[index], onCatClicked = onCatClicked, onSaveCat = onSaveCat)
+                }
 
-                },modifier = modifier.weight(1f))
+            }, modifier = modifier.weight(1f)
+        )
 
-                // CatDbScreen(modifier = modifier.weight(1f).padding(vertical = 5.dp))
+        // CatDbScreen(modifier = modifier.weight(1f).padding(vertical = 5.dp))
 //        Row(  modifier = modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center){
 //            Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
 //                Text(text =" More Cats")
@@ -162,39 +174,39 @@ LaunchedEffect(key1 = catList){
 //        }
 
 
-
-
-
-
-
-           
-
-
-
     }
-    
+
 
 }
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked :(String) -> Unit,  onSaveCat: ( CatsItem)->Unit ){
-    Card(modifier = modifier
-        .wrapContentSize()
-        .padding(10.dp)){
-        AsyncImage(model = catsItem.url, contentDescription = null,modifier= modifier
+fun CatFromList(
+    catsItem: CatsItem,
+    modifier: Modifier = Modifier,
+    onCatClicked: (String) -> Unit,
+    onSaveCat: (CatsItem) -> Unit
+) {
+    Card(
+        modifier = modifier
+            .wrapContentSize()
+            .padding(10.dp)
+    ) {
+        AsyncImage(
+            model = catsItem.url, contentDescription = null,
+            modifier = modifier
 
-            .shadow(5.dp)
-            .combinedClickable(
-                onClick = { onCatClicked(catsItem.id) },
-                onLongClick = {
-                    onSaveCat(catsItem)
-                    Log.d("CAT", "Long cat")
+                .shadow(5.dp)
+                .combinedClickable(
+                    onClick = { onCatClicked(catsItem.id) },
+                    onLongClick = {
+                        onSaveCat(catsItem)
+                        Log.d("CAT", "Long cat")
 
-                }
-            )
-            .animateContentSize(),
+                    }
+                )
+                .animateContentSize(),
         )
     }
 
@@ -202,24 +214,29 @@ fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked 
 
 
 @Composable
-fun CatByID(modifier: Modifier = Modifier,
-            viewModel: CatDetailViewModel =viewModel(factory = CatDetailViewModel.Factory), onListClick :()-> Unit){
+fun CatByID(
+    modifier: Modifier = Modifier,
+    viewModel: CatDetailViewModel = viewModel(factory = CatDetailViewModel.Factory),
+    onListClick: () -> Unit
+) {
     println("CATTTTTT")
     val CoroutineScope = rememberCoroutineScope()
 
     Column {
         //Text(text = viewModel.UiState)
-        when(viewModel.UIState){
+        when (viewModel.UIState) {
             CatUIState.Error -> {
                 Text("error cat ID")
             }
+
             CatUIState.Loading -> {
-                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
+
             is CatUIState.Success -> {
-               // AsyncImage(model = (viewModel.UIState as CatUIState.Success).cat.url, contentDescription =null )
+                // AsyncImage(model = (viewModel.UIState as CatUIState.Success).cat.url, contentDescription =null )
                 CatDetailScreen((viewModel.UIState as CatUIState.Success))
             }
         }
@@ -229,17 +246,26 @@ fun CatByID(modifier: Modifier = Modifier,
 
 
 @Composable
-fun CatDetailScreen(state :CatUIState.Success,modifier: Modifier= Modifier){
-var Cat = state.cat
+fun CatDetailScreen(state: CatUIState.Success, modifier: Modifier = Modifier) {
+    var Cat = state.cat
     val coroutineScope = rememberCoroutineScope()
-    Column (modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
 
-        Card(elevation = CardDefaults.cardElevation(
-            defaultElevation = 25.dp
-        ), modifier = modifier.animateContentSize  ()){
+        Card(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 25.dp
+            ), modifier = modifier.animateContentSize()
+        ) {
 
-                AsyncImage(model = Cat.url, contentDescription = null,modifier = modifier.height(290.dp) )
-
+            AsyncImage(
+                model = Cat.url,
+                contentDescription = null,
+                modifier = modifier.height(290.dp)
+            )
 
 
         }
@@ -248,6 +274,6 @@ var Cat = state.cat
 }
 
 @Composable
-fun TestScreen(){
+fun TestScreen() {
     Text(text = " Texttttttttttttt")
 }

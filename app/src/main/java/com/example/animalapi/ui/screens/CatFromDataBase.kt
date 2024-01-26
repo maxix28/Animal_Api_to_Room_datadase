@@ -29,47 +29,55 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CatDbScreen(
-    viewModel: CatDBViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = CatDBViewModel.Factory)
-   , modifier: Modifier = Modifier){
+    viewModel: CatDBViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = CatDBViewModel.Factory),
+    modifier: Modifier = Modifier
+) {
     val UIState = viewModel.UIState.collectAsState()
-    val coroutineScope= rememberCoroutineScope()
-val localContext  = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val localContext = LocalContext.current
 
-    when(UIState.value){
+    when (UIState.value) {
         CatDBUIState.Error -> {
-Text(text ="Error")
+            Text(text = "Error")
 
         }
+
         CatDBUIState.Loading -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
+
         is CatDBUIState.Success -> {
 //Text(text =(UIState.value as CatDBUIState.Success).cats.toString())
-            LazyColumn(){
-items((UIState.value as CatDBUIState.Success).cats){
-    Card(modifier = modifier.padding(10.dp), elevation = CardDefaults.cardElevation(
-        defaultElevation = 8.dp
-    )){
-        AsyncImage(model = it.url, contentDescription = null, modifier = modifier.combinedClickable(
-            onLongClick = {
-                coroutineScope.launch {
-                    withContext(Dispatchers.IO){
-                        viewModel.deleteCatFromD(it)
+            LazyColumn() {
+                items((UIState.value as CatDBUIState.Success).cats) {
+                    Card(
+                        modifier = modifier.padding(10.dp), elevation = CardDefaults.cardElevation(
+                            defaultElevation = 8.dp
+                        )
+                    ) {
+                        AsyncImage(model = it.url,
+                            contentDescription = null,
+                            modifier = modifier.combinedClickable(
+                                onLongClick = {
+                                    coroutineScope.launch {
+                                        withContext(Dispatchers.IO) {
+                                            viewModel.deleteCatFromD(it)
+
+                                        }
+                                    }
+                                    Toast.makeText(localContext, "Cat Deleted", Toast.LENGTH_LONG)
+                                        .show()
+                                },
+                                onClick = {}
+                            ))?: Text(text ="Connection problem")
 
                     }
-                }
-                Toast.makeText(localContext,"Cat Deleted",Toast.LENGTH_LONG).show()
-                          },
-            onClick = {}
-        ))
-
-    }
-  //  AsyncImage(model = it.url, contentDescription = null, modifier = modifier)
+                    //  AsyncImage(model = it.url, contentDescription = null, modifier = modifier)
 
 //    AsyncImage(model = it.url)
-}
+                }
             }
 
         }
