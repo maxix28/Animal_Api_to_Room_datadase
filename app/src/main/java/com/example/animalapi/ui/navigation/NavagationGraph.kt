@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.animalapi.ui.screens.CatByID
+import com.example.animalapi.ui.screens.CatDbScreen
 
 import com.example.animalapi.ui.screens.CatList
 import com.example.animalapi.ui.screens.CatsScreen
@@ -19,7 +20,11 @@ import com.example.animalapi.ui.screens.TestScreen
 fun NavGrah(navController: NavHostController){
     NavHost(navController = navController, startDestination = Destination.CatList.route ){
         composable(route = Destination.CatList.route){
-            CatsScreen(onCatClicked1 = {navController.navigate("${Destination.CatItemByID.route}/$it")})
+            CatsScreen(onCatClicked1 = {navController.navigate("${Destination.CatItemByID.route}/$it")},
+                onFavourite ={navController.navigate(Destination.CatDB.route)} )
+        }
+        composable(route = Destination.CatDB.route){
+            CatDbScreen()
         }
         composable(route = Destination.CatItemByID.routeWithArgs,
             arguments = listOf(navArgument(Destination.CatItemByID.CatID){

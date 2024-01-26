@@ -2,12 +2,14 @@ package com.example.animalapi.ui.screens
 
 import android.content.ClipData
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -30,6 +33,7 @@ import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -50,51 +55,77 @@ import kotlinx.coroutines.withContext
 @Composable
 fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Factory),
                 modifier: Modifier = Modifier,
-                onCatClicked1 :(String) -> Unit){
+                onCatClicked1 :(String) -> Unit, onFavourite : ()->Unit){
+    val mContext = LocalContext.current
+    val CoroutineScope = rememberCoroutineScope()
+    Scaffold(modifier = modifier.fillMaxSize(),
+        bottomBar = {
+            Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+            Button(onClick = {    CoroutineScope.launch {
+                withContext(Dispatchers.IO){
+                    viewModel.tryAgain()
+                }
 
-val CoroutineScope = rememberCoroutineScope()
-    when(viewModel.CatsUIState){
-        CatsState.Error -> {
-            IconButton(onClick = {
-                CoroutineScope.launch {
-                    withContext(Dispatchers.IO) {
-
-                        viewModel.tryAgain()
-                    }
-                }}) {
-                Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
-
+            } }, modifier = modifier.padding(10.dp)) {
+                Text(text =" More Cats")
             }
-
-        }
-        CatsState.Loading -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                CircularProgressIndicator()
+        }}
+        ,
+        floatingActionButton = {
+            IconButton(onClick = onFavourite) {
+                Icon(imageVector = Icons.Default.Favorite, contentDescription ="Favourite" )
             }
-        }
-        is CatsState.Success -> {
+        }) {paddingValues ->
+        when(viewModel.CatsUIState){
+            CatsState.Error -> {
+                IconButton(onClick = {
+                    CoroutineScope.launch {
+                        withContext(Dispatchers.IO) {
 
-            CatList((viewModel.CatsUIState as CatsState.Success).catList, onMoreCats ={
-                CoroutineScope.launch {
-                    withContext(Dispatchers.IO){
-                        viewModel.tryAgain()
-                    }
+                            viewModel.tryAgain()
+                        }
+                    }}, modifier = modifier.padding(paddingValues)) {
+                    Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
 
                 }
-               },
-                onCatClicked = onCatClicked1,
-                onSaveCat = {
-                    CoroutineScope.launch {
-                        withContext(Dispatchers.IO){
 
-                        viewModel.AddCatToDataBase(it)
+            }
+            CatsState.Loading -> {
+                Box( contentAlignment = Alignment.Center, modifier = modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()){
+                    CircularProgressIndicator()
+                }
+            }
+            is CatsState.Success -> {
+
+                CatList((viewModel.CatsUIState as CatsState.Success).catList,
+                    modifier = modifier.padding(paddingValues),
+//                    onMoreCats ={
+//                    CoroutineScope.launch {
+//                        withContext(Dispatchers.IO){
+//                            viewModel.tryAgain()
+//                        }
+//
+//                    }
+//                },
+                    onCatClicked = onCatClicked1,
+                    onSaveCat = {
+                        CoroutineScope.launch {
+                            withContext(Dispatchers.IO){
+
+                                viewModel.AddCatToDataBase(it)
+
+                            }
+                            Toast.makeText(mContext,"Added to Favourite ", Toast.LENGTH_LONG).show()
                         }
                     }
-                }
 
-            )
+                )
+            }
         }
     }
+
 
 }
 
@@ -102,7 +133,7 @@ val CoroutineScope = rememberCoroutineScope()
 @Composable
 fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier,
             onCatClicked :(String) -> Unit ,
-            onMoreCats:()->Unit,
+         //   onMoreCats:()->Unit,
             onSaveCat: ( CatsItem)->Unit
 )
 {
@@ -123,14 +154,12 @@ LaunchedEffect(key1 = catList){
                 },modifier = modifier.weight(1f))
 
                 // CatDbScreen(modifier = modifier.weight(1f).padding(vertical = 5.dp))
-        Row(  modifier = modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceAround){
-            Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
-                Text(text =" More Cats")
-            }
-            Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
-                Text(text =" More Cats")
-            }
-        }
+//        Row(  modifier = modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center){
+//            Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
+//                Text(text =" More Cats")
+//            }
+//
+//        }
 
 
 

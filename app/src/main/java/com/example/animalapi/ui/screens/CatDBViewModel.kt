@@ -54,6 +54,7 @@ class CatDBViewModel(private val catRepository: CatRepository): ViewModel() {
 //
 //    }
 
+    suspend fun deleteCatFromD(catD: CatD) = catRepository.DeleteCat(catD)
 
 
     companion object{
