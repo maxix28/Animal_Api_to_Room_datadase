@@ -18,6 +18,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.animalapi.CatApplication
 import com.example.animalapi.data.CatRepository
 import com.example.animalapi.network.CatByID
+import com.example.animalapi.network.CatsItem
 import com.example.animalapi.ui.navigation.Destination
 import kotlinx.coroutines.launch
 
@@ -29,9 +30,7 @@ sealed interface CatUIState{
     data class Success( val cat: CatByID): CatUIState
 
 }
-object CatID {
-    var id =""
-}
+
 class CatDetailViewModel(savedStateHandle: SavedStateHandle, private val catRepository: CatRepository): ViewModel() {
     var UIState: CatUIState by mutableStateOf(CatUIState.Loading )
 var catID = checkNotNull(savedStateHandle[Destination.CatItemByID.CatID]).toString()?:null
@@ -53,7 +52,7 @@ init{
     }
 
 }
-
+    suspend fun AddCatToDataBase(cat: CatByID)= catRepository.AddCat(cat.toCatD())
     companion object{
         val Factory : ViewModelProvider.Factory= viewModelFactory {
             initializer {

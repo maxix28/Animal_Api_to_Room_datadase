@@ -30,7 +30,7 @@ class CatsViewModel(private val catRepository: CatRepository): ViewModel() {
 
     var CatsUIState : CatsState by mutableStateOf(CatsState.Loading )
 
-
+suspend fun AddCatToDataBase(cat: CatsItem)= catRepository.AddCat(cat.toCatD())
      suspend fun getCats(){
         try{
 

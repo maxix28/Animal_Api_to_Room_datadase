@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.animalapi.ui.screens.CatByID
-import com.example.animalapi.ui.screens.CatID
+
 import com.example.animalapi.ui.screens.CatList
 import com.example.animalapi.ui.screens.CatsScreen
 import com.example.animalapi.ui.screens.TestScreen
@@ -27,7 +27,7 @@ fun NavGrah(navController: NavHostController){
             })
         ){
           //  println("Try to navigate")
-           CatID.id= it.arguments?.getString(Destination.CatItemByID.routeWithArgs) ?: ""
+
             CatByID(onListClick = { navController.navigate(Destination.CatList.route) }, modifier = Modifier.fillMaxSize())
 
         }
