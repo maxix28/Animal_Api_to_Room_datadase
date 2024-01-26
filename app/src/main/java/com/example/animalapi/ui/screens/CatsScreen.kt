@@ -1,6 +1,7 @@
 package com.example.animalapi.ui.screens
 
 import android.content.ClipData
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -42,7 +43,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.animalapi.network.CatByID
 import com.example.animalapi.network.CatsItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CatsScreen( viewModel: CatsViewModel = viewModel( factory = CatsViewModel.Factory),
@@ -54,7 +57,10 @@ val CoroutineScope = rememberCoroutineScope()
         CatsState.Error -> {
             IconButton(onClick = {
                 CoroutineScope.launch {
-                    viewModel.tryAgain()
+                    withContext(Dispatchers.IO) {
+
+                        viewModel.tryAgain()
+                    }
                 }}) {
                 Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
 
@@ -70,7 +76,10 @@ val CoroutineScope = rememberCoroutineScope()
 
             CatList((viewModel.CatsUIState as CatsState.Success).catList, onMoreCats ={
                 CoroutineScope.launch {
-                    viewModel.tryAgain()
+                    withContext(Dispatchers.IO){
+                        viewModel.tryAgain()
+                    }
+
                 }
                },
                 onCatClicked = onCatClicked1
@@ -84,7 +93,12 @@ val CoroutineScope = rememberCoroutineScope()
 
 @Composable
 fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier,onCatClicked :(String) -> Unit , onMoreCats:()->Unit){
+    val coroutineScope = rememberCoroutineScope()
+LaunchedEffect(key1 = catList){
     catList.sortedBy { it.height   }
+}
+
+
     Column(    modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
 
             LazyVerticalGrid(columns = GridCells.Adaptive(128.dp),
@@ -121,13 +135,17 @@ fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier,onCatClicked 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked :(String) -> Unit ){
-    Card(modifier = modifier.wrapContentSize().padding(10.dp)){
+    Card(modifier = modifier
+        .wrapContentSize()
+        .padding(10.dp)){
         AsyncImage(model = catsItem.url, contentDescription = null,modifier= modifier
 
             .shadow(5.dp)
             .combinedClickable(
                 onClick = { onCatClicked(catsItem.id) },
-                onLongClick = {}
+                onLongClick = {
+                    Log.d("CAT", "Long cat")
+                }
             )
             .animateContentSize(),
         )
@@ -166,12 +184,16 @@ fun CatByID(modifier: Modifier = Modifier,
 @Composable
 fun CatDetailScreen(state :CatUIState.Success,modifier: Modifier= Modifier){
 var Cat = state.cat
+    val coroutineScope = rememberCoroutineScope()
     Column (modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
 
         Card(elevation = CardDefaults.cardElevation(
             defaultElevation = 25.dp
         ), modifier = modifier.animateContentSize  ()){
-            AsyncImage(model = Cat.url, contentDescription = null,modifier = modifier.height(290.dp) )
+
+                AsyncImage(model = Cat.url, contentDescription = null,modifier = modifier.height(290.dp) )
+
+
 
         }
 

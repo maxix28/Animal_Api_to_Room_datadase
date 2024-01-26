@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    id ("kotlin-kapt")
+
 }
 
 android {
@@ -96,4 +98,10 @@ dependencies {
     implementation ("com.squareup.retrofit:retrofit:2.0.0-beta1")
     implementation ("com.squareup.okhttp:okhttp:2.5.0")
     implementation ("com.squareup.retrofit:converter-gson:2.0.0-beta1")
+
+
+
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation ("androidx.room:room-ktx:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
 }
