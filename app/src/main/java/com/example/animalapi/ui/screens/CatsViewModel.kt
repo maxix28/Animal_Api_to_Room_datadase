@@ -41,7 +41,6 @@ class CatsViewModel
 suspend fun AddCatToDataBase(cat: CatsItem)= catRepository.AddCat(cat.toCatD())
      suspend fun getCats(){
         try{
-
             CatsUIState = CatsState.Success(catRepository.getCats())
         }catch (e:Exception){
             CatsUIState = CatsState.Error
@@ -55,26 +54,22 @@ suspend fun AddCatToDataBase(cat: CatsItem)= catRepository.AddCat(cat.toCatD())
 init{
     viewModelScope.launch {
         withContext(Dispatchers.IO){
-
               getCats()
-
             Log.d("Cat","HiltWork")
-
         }
-
     }
 
 
 
 
 }
-    companion object{
-        val Factory : ViewModelProvider.Factory= viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as CatApplication)
-                val catRepository = application.container.catRepository
-                CatsViewModel(catRepository)
-            }
-        }
-    }
+//    companion object{
+//        val Factory : ViewModelProvider.Factory= viewModelFactory {
+//            initializer {
+//                val application = (this[APPLICATION_KEY] as CatApplication)
+//                val catRepository = application.container.catRepository
+//                CatsViewModel(catRepository)
+//            }
+//        }
+//    }
 }

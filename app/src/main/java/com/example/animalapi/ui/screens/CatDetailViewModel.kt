@@ -58,12 +58,12 @@ init{
 }
   //  suspend fun AddCatToDataBase(cat: CatByID)= catRepository.AddCat(cat.toCatD())
     companion object{
-        val Factory : ViewModelProvider.Factory= viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
-                val catRepository = application.container.catRepository
-                CatDetailViewModel(this.createSavedStateHandle(),catRepository)
-            }
-        }
+//        val Factory : ViewModelProvider.Factory= viewModelFactory {
+//            initializer {
+//                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
+//                val catRepository = application.container.catRepository
+//                CatDetailViewModel(this.createSavedStateHandle(),catRepository)
+//            }
+//        }
     }
 }

@@ -17,20 +17,20 @@ interface AppContainer {
 
 }
 
-class DefaultAppContainer(val context: Context): AppContainer{
-private val baseUrl="https://api.thecatapi.com/"
-
-private val retrofit = Retrofit.Builder()
-    .baseUrl(baseUrl)
-
-    .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-
-
-    .build()
-    .create(CatApiInterface::class.java)
-
-
-    override val catRepository: CatRepository by lazy {
-        NetworkCatRepository(retrofit,CatDataBase.getDataBase(context).catDao())
-    }
-}
+//class DefaultAppContainer(val context: Context): AppContainer{
+//private val baseUrl="https://api.thecatapi.com/"
+//
+//private val retrofit = Retrofit.Builder()
+//    .baseUrl(baseUrl)
+//
+//    .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+//
+//
+//    .build()
+//    .create(CatApiInterface::class.java)
+//
+//
+//    override val catRepository: CatRepository by lazy {
+//        NetworkCatRepository(retrofit,CatDataBase.getDataBase(context).catDao())
+//    }
+//}

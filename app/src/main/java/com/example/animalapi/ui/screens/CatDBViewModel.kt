@@ -62,12 +62,12 @@ class CatDBViewModel @Inject constructor(private val catRepository: CatRepositor
     companion object{
         private const val TIMEOUT_MILLIS = 5_000L
 
-        val Factory : ViewModelProvider.Factory= viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
-                val catRepository = application.container.catRepository
-                CatDBViewModel(catRepository)
-            }
-        }
+//        val Factory : ViewModelProvider.Factory= viewModelFactory {
+//            initializer {
+//                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
+//                val catRepository = application.container.catRepository
+//                CatDBViewModel(catRepository)
+//            }
+//        }
     }
 }
