@@ -120,12 +120,15 @@ LaunchedEffect(key1 = catList){
                         CatFromList(catList[index], onCatClicked = onCatClicked, onSaveCat = onSaveCat)
                     }
 
-                })
-        Row(  modifier = modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center){
+                },modifier = modifier.weight(1f))
+
+                // CatDbScreen(modifier = modifier.weight(1f).padding(vertical = 5.dp))
+        Row(  modifier = modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceAround){
             Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
                 Text(text =" More Cats")
-
-
+            }
+            Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
+                Text(text =" More Cats")
             }
         }
 

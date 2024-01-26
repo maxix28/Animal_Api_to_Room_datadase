@@ -16,7 +16,7 @@ interface CatRepository {
 
     suspend fun  AddCat(catD: CatD)
     suspend fun  DeleteCat(catD: CatD)
-    fun getAllCats(): Flow<CatD>
+    fun getAllCats():  Flow<List<CatD>>
 }
 
 class NetworkCatRepository(private val catApiInterface: CatApiInterface, private val catDao: CatDao ): CatRepository{
@@ -28,5 +28,5 @@ class NetworkCatRepository(private val catApiInterface: CatApiInterface, private
 
     override suspend fun DeleteCat(catD: CatD) = catDao.DeleteCat(catD = catD)
 
-    override fun getAllCats(): Flow<CatD>  = catDao.getAllCats()
+    override fun getAllCats(): Flow<List<CatD>>  = catDao.getAllCats()
 }
