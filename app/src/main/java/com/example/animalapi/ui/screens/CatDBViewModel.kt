@@ -11,11 +11,13 @@ import com.example.animalapi.CatApplication
 import com.example.animalapi.data.CatRepository
 import com.example.animalapi.databasaData.CatD
 import com.example.animalapi.network.CatByID
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 
 sealed interface CatDBUIState{
@@ -35,8 +37,8 @@ sealed interface CatDBUIState{
     data class Success(val cats: List<CatD>): CatDBUIState
 
 }
-
-class CatDBViewModel(private val catRepository: CatRepository): ViewModel() {
+@HiltViewModel
+class CatDBViewModel @Inject constructor(private val catRepository: CatRepository): ViewModel() {
     //var UIState: CatDBUIState by mutableStateOf(CatDBUIState.Loading)
     val UIState : StateFlow<CatDBUIState> =
         try{catRepository.getAllCats().map{ CatDBUIState.Success(it)}
@@ -60,12 +62,12 @@ class CatDBViewModel(private val catRepository: CatRepository): ViewModel() {
     companion object{
         private const val TIMEOUT_MILLIS = 5_000L
 
-        val Factory : ViewModelProvider.Factory= viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
-                val catRepository = application.container.catRepository
-                CatDBViewModel(catRepository)
-            }
-        }
+//        val Factory : ViewModelProvider.Factory= viewModelFactory {
+//            initializer {
+//                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
+//                val catRepository = application.container.catRepository
+//                CatDBViewModel(catRepository)
+//            }
+//        }
     }
 }
