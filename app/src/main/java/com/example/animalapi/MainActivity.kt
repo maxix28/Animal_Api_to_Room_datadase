@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.animalapi.ui.navigation.NavGrah
 import com.example.animalapi.ui.screens.CatByID
+import com.example.animalapi.ui.screens.CatDbScreen
 import com.example.animalapi.ui.screens.CatsScreen
 import com.example.animalapi.ui.theme.AnimalAPITheme
 
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     NavGrah(rememberNavController())
+                    //CatDbScreen()
                 }
             }
         }

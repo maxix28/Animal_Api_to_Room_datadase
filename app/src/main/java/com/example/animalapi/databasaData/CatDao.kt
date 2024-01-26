@@ -16,5 +16,5 @@ interface CatDao {
     suspend fun DeleteCat(catD: CatD)
 
     @Query("select * from CatInRoom")
-     fun getAllCats(): Flow<CatD>
+     fun getAllCats(): Flow<List<CatD>>
 }

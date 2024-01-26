@@ -82,7 +82,15 @@ val CoroutineScope = rememberCoroutineScope()
 
                 }
                },
-                onCatClicked = onCatClicked1
+                onCatClicked = onCatClicked1,
+                onSaveCat = {
+                    CoroutineScope.launch {
+                        withContext(Dispatchers.IO){
+
+                        viewModel.AddCatToDataBase(it)
+                        }
+                    }
+                }
 
             )
         }
@@ -92,7 +100,12 @@ val CoroutineScope = rememberCoroutineScope()
 
 
 @Composable
-fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier,onCatClicked :(String) -> Unit , onMoreCats:()->Unit){
+fun CatList(catList : List<CatsItem>,modifier: Modifier = Modifier,
+            onCatClicked :(String) -> Unit ,
+            onMoreCats:()->Unit,
+            onSaveCat: ( CatsItem)->Unit
+)
+{
     val coroutineScope = rememberCoroutineScope()
 LaunchedEffect(key1 = catList){
     catList.sortedBy { it.height   }
@@ -104,15 +117,18 @@ LaunchedEffect(key1 = catList){
             LazyVerticalGrid(columns = GridCells.Adaptive(128.dp),
                 content = {
                     items(catList.size) { index ->
-                        CatFromList(catList[index], onCatClicked = onCatClicked)
+                        CatFromList(catList[index], onCatClicked = onCatClicked, onSaveCat = onSaveCat)
                     }
 
-                })
-        Row(  modifier = modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center){
+                },modifier = modifier.weight(1f))
+
+                // CatDbScreen(modifier = modifier.weight(1f).padding(vertical = 5.dp))
+        Row(  modifier = modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceAround){
             Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
                 Text(text =" More Cats")
-
-
+            }
+            Button(onClick = onMoreCats, modifier = modifier.padding(10.dp)) {
+                Text(text =" More Cats")
             }
         }
 
@@ -134,7 +150,7 @@ LaunchedEffect(key1 = catList){
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked :(String) -> Unit ){
+fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked :(String) -> Unit,  onSaveCat: ( CatsItem)->Unit ){
     Card(modifier = modifier
         .wrapContentSize()
         .padding(10.dp)){
@@ -144,7 +160,9 @@ fun CatFromList(catsItem: CatsItem, modifier: Modifier = Modifier, onCatClicked 
             .combinedClickable(
                 onClick = { onCatClicked(catsItem.id) },
                 onLongClick = {
+                    onSaveCat(catsItem)
                     Log.d("CAT", "Long cat")
+
                 }
             )
             .animateContentSize(),
