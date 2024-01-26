@@ -44,18 +44,20 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.animalapi.network.CatByID
 import com.example.animalapi.network.CatsItem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
 fun CatsScreen(
-    viewModel: CatsViewModel = viewModel(factory = CatsViewModel.Factory),
-    modifier: Modifier = Modifier,
+    viewModel: CatsViewModel = hiltViewModel<CatsViewModel>() //viewModel(factory = CatsViewModel.Factory)
+    ,modifier: Modifier = Modifier,
     onCatClicked1: (String) -> Unit, onFavourite: () -> Unit
 ) {
     val mContext = LocalContext.current
@@ -216,7 +218,8 @@ fun CatFromList(
 @Composable
 fun CatByID(
     modifier: Modifier = Modifier,
-    viewModel: CatDetailViewModel = viewModel(factory = CatDetailViewModel.Factory),
+    viewModel: CatDetailViewModel = hiltViewModel<CatDetailViewModel>()// viewModel(factory = CatDetailViewModel.Factory)
+    ,
     onListClick: () -> Unit
 ) {
     println("CATTTTTT")

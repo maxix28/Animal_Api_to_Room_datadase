@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +30,8 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CatDbScreen(
-    viewModel: CatDBViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = CatDBViewModel.Factory),
+    viewModel: CatDBViewModel = hiltViewModel<CatDBViewModel>() //androidx.lifecycle.viewmodel.compose.viewModel(factory = CatDBViewModel.Factory)
+    ,
     modifier: Modifier = Modifier
 ) {
     val UIState = viewModel.UIState.collectAsState()
