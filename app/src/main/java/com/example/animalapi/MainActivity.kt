@@ -17,7 +17,9 @@ import com.example.animalapi.ui.screens.CatByID
 import com.example.animalapi.ui.screens.CatDbScreen
 import com.example.animalapi.ui.screens.CatsScreen
 import com.example.animalapi.ui.theme.AnimalAPITheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

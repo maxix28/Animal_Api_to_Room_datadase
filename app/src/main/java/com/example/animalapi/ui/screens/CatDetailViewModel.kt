@@ -20,7 +20,9 @@ import com.example.animalapi.data.CatRepository
 import com.example.animalapi.network.CatByID
 import com.example.animalapi.network.CatsItem
 import com.example.animalapi.ui.navigation.Destination
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 sealed interface CatUIState{
@@ -30,8 +32,8 @@ sealed interface CatUIState{
     data class Success( val cat: CatByID): CatUIState
 
 }
-
-class CatDetailViewModel(savedStateHandle: SavedStateHandle, private val catRepository: CatRepository): ViewModel() {
+@HiltViewModel
+class CatDetailViewModel @Inject constructor(savedStateHandle: SavedStateHandle, private val catRepository: CatRepository): ViewModel() {
     var UIState: CatUIState by mutableStateOf(CatUIState.Loading )
 var catID = checkNotNull(savedStateHandle[Destination.CatItemByID.CatID]).toString()?:null
     private suspend fun getCatByID(id: String){
@@ -49,17 +51,19 @@ var catID = checkNotNull(savedStateHandle[Destination.CatItemByID.CatID]).toStri
 init{
     viewModelScope.launch {
         getCatByID(catID!!)
+        Log.d("CAT", "USE hilt")
+
     }
 
 }
-    suspend fun AddCatToDataBase(cat: CatByID)= catRepository.AddCat(cat.toCatD())
+  //  suspend fun AddCatToDataBase(cat: CatByID)= catRepository.AddCat(cat.toCatD())
     companion object{
-        val Factory : ViewModelProvider.Factory= viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
-                val catRepository = application.container.catRepository
-                CatDetailViewModel(this.createSavedStateHandle(),catRepository)
-            }
-        }
+//        val Factory : ViewModelProvider.Factory= viewModelFactory {
+//            initializer {
+//                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CatApplication)
+//                val catRepository = application.container.catRepository
+//                CatDetailViewModel(this.createSavedStateHandle(),catRepository)
+//            }
+//        }
     }
 }
