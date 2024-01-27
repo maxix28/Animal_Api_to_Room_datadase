@@ -1,6 +1,8 @@
 package com.example.animalapi.data
 
 import com.example.animalapi.databasaData.CatD
+import com.example.animalapi.databasaData.CatDao
+import com.example.animalapi.network.CatApiInterface
 import com.example.animalapi.network.CatByID
 import com.example.animalapi.network.CatsItem
 import kotlinx.coroutines.flow.Flow
