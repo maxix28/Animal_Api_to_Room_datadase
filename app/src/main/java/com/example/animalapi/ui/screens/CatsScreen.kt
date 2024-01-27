@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,7 +39,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -57,7 +63,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun CatsScreen(
     viewModel: CatsViewModel = hiltViewModel<CatsViewModel>() //viewModel(factory = CatsViewModel.Factory)
-    ,modifier: Modifier = Modifier,
+    , modifier: Modifier = Modifier,
     onCatClicked1: (String) -> Unit, onFavourite: () -> Unit
 ) {
     val mContext = LocalContext.current
@@ -131,6 +137,17 @@ fun CatsScreen(
                             Toast.makeText(mContext, "Added to Favourite ", Toast.LENGTH_LONG)
                                 .show()
                         }
+                    },
+                    deleteCatFromD = {
+                        CoroutineScope.launch {
+                            withContext(Dispatchers.IO) {
+
+                                viewModel.deleteCatFromD(it)
+
+                            }
+                            Toast.makeText(mContext, "Added to Favourite ", Toast.LENGTH_LONG)
+                                .show()
+                        }
                     }
 
                 )
@@ -147,8 +164,10 @@ fun CatList(
     catList: List<CatsItem>, modifier: Modifier = Modifier,
     onCatClicked: (String) -> Unit,
     //   onMoreCats:()->Unit,
-    onSaveCat: (CatsItem) -> Unit
-) {
+    onSaveCat: (CatsItem) -> Unit,
+    deleteCatFromD: (CatsItem) -> Unit,
+
+    ) {
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(key1 = catList) {
         catList.sortedBy { it.height }
@@ -161,7 +180,12 @@ fun CatList(
             columns = GridCells.Adaptive(128.dp),
             content = {
                 items(catList.size) { index ->
-                    CatFromList(catList[index], onCatClicked = onCatClicked, onSaveCat = onSaveCat)
+                    CatFromList(
+                        catList[index],
+                        onCatClicked = onCatClicked,
+                        onSaveCat = onSaveCat,
+                        deleteCatFromD = deleteCatFromD
+                    )
                 }
 
             }, modifier = modifier.weight(1f)
@@ -188,28 +212,61 @@ fun CatFromList(
     catsItem: CatsItem,
     modifier: Modifier = Modifier,
     onCatClicked: (String) -> Unit,
-    onSaveCat: (CatsItem) -> Unit
+    onSaveCat: (CatsItem) -> Unit,
+    deleteCatFromD: (CatsItem) -> Unit,
 ) {
+    val favState by remember {
+        mutableStateOf(catsItem.fav)
+    }
+
+    val coroutineScope = rememberCoroutineScope()
     Card(
         modifier = modifier
             .wrapContentSize()
             .padding(10.dp)
     ) {
-        AsyncImage(
-            model = catsItem.url, contentDescription = null,
-            modifier = modifier
+        Column {
+            AsyncImage(
 
-                .shadow(5.dp)
-                .combinedClickable(
-                    onClick = { onCatClicked(catsItem.id) },
-                    onLongClick = {
+                model = catsItem.url, contentDescription = null,
+                modifier = modifier
+
+                    .shadow(5.dp)
+                    .combinedClickable(
+                        onClick = { onCatClicked(catsItem.id) },
+                        onLongClick = {
+                            onSaveCat(catsItem)
+                            Log.d("CAT", "Long cat")
+
+                        }
+                    )
+
+                    .animateContentSize(),
+            )
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(15.dp)
+            ) {
+                IconButton(onClick = {
+                    if (!catsItem.fav) {
                         onSaveCat(catsItem)
-                        Log.d("CAT", "Long cat")
+                    } else {
+
+                            deleteCatFromD(catsItem)
+
 
                     }
-                )
-                .animateContentSize(),
-        )
+                    catsItem.fav = !catsItem.fav
+                }) {
+                    Icon(
+                        imageVector = if (favState) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Like icon"
+                    )
+                }
+            }
+        }
+
     }
 
 }
@@ -263,12 +320,15 @@ fun CatDetailScreen(state: CatUIState.Success, modifier: Modifier = Modifier) {
                 defaultElevation = 25.dp
             ), modifier = modifier.animateContentSize()
         ) {
+            Column {
+                AsyncImage(
+                    model = Cat.url,
+                    contentDescription = null,
+                    modifier = modifier.height(290.dp)
+                )
 
-            AsyncImage(
-                model = Cat.url,
-                contentDescription = null,
-                modifier = modifier.height(290.dp)
-            )
+
+            }
 
 
         }

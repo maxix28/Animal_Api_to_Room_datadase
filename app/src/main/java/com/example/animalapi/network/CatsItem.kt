@@ -8,7 +8,8 @@ data class CatsItem(
     val height: Int,
     val id: String,
     val url: String,
-    val width: Int
+    val width: Int,
+    var fav : Boolean = false
 ) {
     fun toCatD(): CatD = CatD(id = id,url = url, height = height, width = width)
 }

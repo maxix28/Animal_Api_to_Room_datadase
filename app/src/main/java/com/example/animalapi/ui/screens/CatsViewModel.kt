@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.animalapi.CatApplication
 import com.example.animalapi.data.CatRepository
+import com.example.animalapi.databasaData.CatD
 import com.example.animalapi.network.CatsItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Delay
@@ -37,6 +38,7 @@ class CatsViewModel
 ): ViewModel() {
 
     var CatsUIState : CatsState by mutableStateOf(CatsState.Loading )
+    suspend fun deleteCatFromD(cat: CatsItem) = catRepository.DeleteCat(cat.toCatD())
 
 suspend fun AddCatToDataBase(cat: CatsItem)= catRepository.AddCat(cat.toCatD())
      suspend fun getCats(){

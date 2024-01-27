@@ -3,9 +3,12 @@ package com.example.animalapi.ui.screens
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -52,35 +55,45 @@ fun CatDbScreen(
 
         is CatDBUIState.Success -> {
 //Text(text =(UIState.value as CatDBUIState.Success).cats.toString())
-            LazyColumn() {
-                items((UIState.value as CatDBUIState.Success).cats) {
-                    Card(
-                        modifier = modifier.padding(10.dp), elevation = CardDefaults.cardElevation(
-                            defaultElevation = 8.dp
-                        )
-                    ) {
-                        AsyncImage(model = it.url,
-                            contentDescription = null,
-                            modifier = modifier.combinedClickable(
-                                onLongClick = {
-                                    coroutineScope.launch {
-                                        withContext(Dispatchers.IO) {
-                                            viewModel.deleteCatFromD(it)
+            Column {
+                LazyColumn() {
+                    items((UIState.value as CatDBUIState.Success).cats) {
+                        Card(
+                            modifier = modifier.padding(10.dp), elevation = CardDefaults.cardElevation(
+                                defaultElevation = 8.dp
+                            )
+                        ) {
+                            AsyncImage(model = it.url,
+                                contentDescription = null,
+                                modifier = modifier.combinedClickable(
+                                    onLongClick = {
+                                        coroutineScope.launch {
+                                            withContext(Dispatchers.IO) {
+                                                viewModel.deleteCatFromD(it)
 
+                                            }
                                         }
-                                    }
-                                    Toast.makeText(localContext, "Cat Deleted", Toast.LENGTH_LONG)
-                                        .show()
-                                },
-                                onClick = {}
-                            ))?: Text(text ="Connection problem")
+                                        Toast.makeText(localContext, "Cat Deleted", Toast.LENGTH_LONG)
+                                            .show()
+                                    },
+                                    onClick = {}
+                                ))?: Text(text ="Connection problem")
 
-                    }
-                    //  AsyncImage(model = it.url, contentDescription = null, modifier = modifier)
+                        }
+                        //  AsyncImage(model = it.url, contentDescription = null, modifier = modifier)
 
 //    AsyncImage(model = it.url)
+                    }
+                    item {
+
+                    }
                 }
+                Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){  Text("Long press to delete")
+
+                }
+
             }
+
 
         }
     }
